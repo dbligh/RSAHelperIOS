@@ -62,7 +62,7 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
     
     @objc public static func exportPublicKeyToPEM(_ pubKey: SecKey) -> String? {
         let pubKeyData = SecKeyCopyExternalRepresentation(pubKey, nil);
-        let encodedKey = exportPublicKeyToDER2(pubKeyData! as NSData as Data);
+        let encodedKey = exportPublicKeyToDER(pubKeyData! as NSData as Data);
         return PEMKeyFromDERKey(encodedKey, prefix: kCryptoExportImportManagerPublicKeyInitialTag, suffix: kCryptoExportImportManagerPublicKeyFinalTag);
     }
     
@@ -89,42 +89,42 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
      * need to remove add the full PKCS#1 ASN.1 wrapping. Returns a DER representation of the key.
      */
    
-    private static func exportPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
-        // first we create the space for the ASN.1 header and decide about its length
-        var headerData = Data(count: kCryptoExportImportManagerASNHeaderLengthForRSA)
-        let bitstringEncodingLength = bytesNeededForRepresentingInteger(rawPublicKeyBytes.count)
+    // private static func exportPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
+    //     // first we create the space for the ASN.1 header and decide about its length
+    //     var headerData = Data(count: kCryptoExportImportManagerASNHeaderLengthForRSA)
+    //     let bitstringEncodingLength = bytesNeededForRepresentingInteger(rawPublicKeyBytes.count)
         
-        // start building the ASN.1 header
-        let headerBuffer = headerData.withUnsafeMutableBytes {
-            (bytes: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8> in
-            bytes[0] = kCryptoExportImportManagerASNHeaderSequenceMark // sequence start
-            return bytes
-        }
+    //     // start building the ASN.1 header
+    //     let headerBuffer = headerData.withUnsafeMutableBytes {
+    //         (bytes: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8> in
+    //         bytes[0] = kCryptoExportImportManagerASNHeaderSequenceMark // sequence start
+    //         return bytes
+    //     }
         
-        // total size (OID + encoding + key size) + 2 (marks)
-        let totalSize = kCryptoExportImportManagerRSAOIDHeaderLength + bitstringEncodingLength + rawPublicKeyBytes.count + 2
-        let totalSizebitstringEncodingLength = encodeASN1LengthParameter(totalSize, buffer: &(headerBuffer[1]))
+    //     // total size (OID + encoding + key size) + 2 (marks)
+    //     let totalSize = kCryptoExportImportManagerRSAOIDHeaderLength + bitstringEncodingLength + rawPublicKeyBytes.count + 2
+    //     let totalSizebitstringEncodingLength = encodeASN1LengthParameter(totalSize, buffer: &(headerBuffer[1]))
         
-        // bitstring header
-        var bitstringData = Data(count: kCryptoExportImportManagerASNHeaderLengthForRSA)
-        var keyLengthBytesEncoded = 0
-        let bitstringBuffer = bitstringData.withUnsafeMutableBytes {
-            (bytes: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8> in
-            bytes[0] = kCryptoExportImportManagerASNHeaderBitstringMark // key length mark
-            keyLengthBytesEncoded = encodeASN1LengthParameter(rawPublicKeyBytes.count+1, buffer: &(bytes[1]))
-            bytes[keyLengthBytesEncoded + 1] = 0x00
-            return bytes
-        }
+    //     // bitstring header
+    //     var bitstringData = Data(count: kCryptoExportImportManagerASNHeaderLengthForRSA)
+    //     var keyLengthBytesEncoded = 0
+    //     let bitstringBuffer = bitstringData.withUnsafeMutableBytes {
+    //         (bytes: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8> in
+    //         bytes[0] = kCryptoExportImportManagerASNHeaderBitstringMark // key length mark
+    //         keyLengthBytesEncoded = encodeASN1LengthParameter(rawPublicKeyBytes.count+1, buffer: &(bytes[1]))
+    //         bytes[keyLengthBytesEncoded + 1] = 0x00
+    //         return bytes
+    //     }
         
-        // build DER key.
-        var derKey = Data(capacity: totalSize + totalSizebitstringEncodingLength)
-        derKey.append(headerBuffer, count: totalSizebitstringEncodingLength + 1)
-        derKey.append(kCryptoExportImportManagerRSAOIDHeader, count: kCryptoExportImportManagerRSAOIDHeaderLength) // Add OID header
-        derKey.append(bitstringBuffer, count: keyLengthBytesEncoded + 2) // 0x03 + key bitstring length + 0x00
-        derKey.append(rawPublicKeyBytes) // public key raw data.
+    //     // build DER key.
+    //     var derKey = Data(capacity: totalSize + totalSizebitstringEncodingLength)
+    //     derKey.append(headerBuffer, count: totalSizebitstringEncodingLength + 1)
+    //     derKey.append(kCryptoExportImportManagerRSAOIDHeader, count: kCryptoExportImportManagerRSAOIDHeaderLength) // Add OID header
+    //     derKey.append(bitstringBuffer, count: keyLengthBytesEncoded + 2) // 0x03 + key bitstring length + 0x00
+    //     derKey.append(rawPublicKeyBytes) // public key raw data.
         
-        return derKey
-    }
+    //     return derKey
+    // }
 
     /**
      * This function prepares a RSA public key generated with Apple SecKeyGeneratePair to be exported
@@ -132,7 +132,7 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
      * keys in a very raw format. If we want to use it on OpenSSL, PHP or almost anywhere outside iOS, we
      * need to remove add the full PKCS#1 ASN.1 wrapping. Returns a DER representation of the key.
      */
-    private static func exportRSAPublicKeyToDER2(_ rawPublicKeyBytes: Data) -> Data {
+    private static func exportRSAPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
         // first we create the space for the ASN.1 header and decide about its length
         let bitstringEncodingLength = bytesNeededForRepresentingInteger(rawPublicKeyBytes.count)
         

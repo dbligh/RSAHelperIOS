@@ -88,7 +88,7 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
      * keys in a very raw format. If we want to use it on OpenSSL, PHP or almost anywhere outside iOS, we
      * need to remove add the full PKCS#1 ASN.1 wrapping. Returns a DER representation of the key.
      */
-   
+
     // private static func exportPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
     //     // first we create the space for the ASN.1 header and decide about its length
     //     var headerData = Data(count: kCryptoExportImportManagerASNHeaderLengthForRSA)
@@ -132,7 +132,7 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
      * keys in a very raw format. If we want to use it on OpenSSL, PHP or almost anywhere outside iOS, we
      * need to remove add the full PKCS#1 ASN.1 wrapping. Returns a DER representation of the key.
      */
-    private static func exportRSAPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
+    private static func exportPublicKeyToDER(_ rawPublicKeyBytes: Data) -> Data {
         // first we create the space for the ASN.1 header and decide about its length
         let bitstringEncodingLength = bytesNeededForRepresentingInteger(rawPublicKeyBytes.count)
         

@@ -60,7 +60,7 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
         RSAUtils.deleteRSAKeyFromKeychain(tagName)
     }
     
-    @objc public static func exportPublicKeyToPEM(_ pubKey: SecKey) -> data? {
+    @objc public static func exportPublicKeyToPEM(_ pubKey: SecKey) -> String? {
         let pubKeyData = SecKeyCopyExternalRepresentation(pubKey, nil);
         let pubDer = (pubKeyData! as Data).base64EncodedString();
         let pubPem = "-----BEGIN PUBLIC KEY-----\n" + pubDer + "\n-----END PUBLIC KEY-----";

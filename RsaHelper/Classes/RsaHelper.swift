@@ -62,12 +62,8 @@ private let kCryptoExportImportManagerPublicNumberOfCharactersInALine = 64
     
     @objc public static func exportPublicKeyToPEM(_ pubKey: SecKey) -> String? {
         let pubKeyData = SecKeyCopyExternalRepresentation(pubKey, nil);
-        let pubDer = (pubKeyData! as Data).base64EncodedString();
-        let pubPem = "-----BEGIN PUBLIC KEY-----\n" + pubDer + "\n-----END PUBLIC KEY-----";
-        return String(decoding: pubPem, as: UTF8.self);
-        // let pubKeyData = SecKeyCopyExternalRepresentation(pubKey, nil);
-        // let encodedKey = exportPublicKeyToDER(pubKeyData! as NSData as Data);
-        // return PEMKeyFromDERKey(encodedKey, prefix: kCryptoExportImportManagerPublicKeyInitialTag, suffix: kCryptoExportImportManagerPublicKeyFinalTag);
+        let encodedKey = exportPublicKeyToDER(pubKeyData! as NSData as Data);
+        return PEMKeyFromDERKey(encodedKey, prefix: kCryptoExportImportManagerPublicKeyInitialTag, suffix: kCryptoExportImportManagerPublicKeyFinalTag);
     }
     
     @objc public static func exportPrivateKeyToPEM(_ privKey: SecKey) -> String? {
